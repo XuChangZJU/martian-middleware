@@ -1,10 +1,11 @@
 {
-  "name": "martian-networking-middleware",
+  "name": "martian-networking",
   "version": "1.0.0",
   "description": "rest api access middleware on redux",
   "main": "api.js",
   "files": [
-    "api.js"
+    "apiMiddleware.js",
+    "populateHttpHeaderMiddleware.js"
   ],
   "scripts": {
     "test": "mocha --compilers js:babel-core/register --reporter spec test/*.js"
@@ -14,7 +15,7 @@
     "isomorphic-fetch": "^2.1.1",
     "humps": "^1.0.0",
     "es6-symbol":"^3.0.2",
-    "martian-domain": "git+ssh://git@git.oschina.net:xuchangZJU/martian-domain.git"
+    "martian-domain": "XuChangZJU/martian-domain"
   },
   "devDependencies": {
     "babel": "^6.1.18",
