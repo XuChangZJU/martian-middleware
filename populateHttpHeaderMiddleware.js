@@ -9,7 +9,7 @@ const merge = require("lodash/merge");
 
 const POPULATE_HTTP_HEADER_MW_SYMBOL = Symbol('PREQUEST_MIDDLEWARE');
 // import {API_MW_SYMBOL} from 'api-middleware';
-const API_MW_SYMBOL = require("./api-middleware").API_MW_SYMBOL;
+const API_MW_SYMBOL = require("./apiMiddleware").API_MW_SYMBOL;
 
 /**
  *  此中间件用于构建http header，这个域(在state树上)的值由创建这个middleware的回调函数决定。

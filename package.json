@@ -34,5 +34,5 @@
     "fetch-mock": "^4.1.0"
   },
   "author": "XuChang",
-  "license": "ISC"
+  "license": "MIT"
 }
