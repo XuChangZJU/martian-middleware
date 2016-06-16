@@ -15,7 +15,7 @@
     "isomorphic-fetch": "^2.1.1",
     "humps": "^1.0.0",
     "es6-symbol":"^3.0.2",
-    "martian-domain": "XuChangZJU/martian-domain"
+    "martian-domain": "XuChangZJU/martian-domain#dev"
   },
   "devDependencies": {
     "babel": "^6.1.18",
