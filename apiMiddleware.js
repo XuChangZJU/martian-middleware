@@ -113,13 +113,14 @@ var apiMiddleware =  ({ dispatch, getState }) => next => action => {
     const [ requestType, successType, failureType ] = types;
 
     if(!netAvailable) {
-        return dispatch({
+        return Promise.reject(next({
             type: failureType,
             error: errorCode.errorNetUnavailable
-        });
+        }));
     }
 
-    next(actionWith({ type: requestType }))
+    next(actionWith({ type: requestType }));
+
 
     return callApi(endpoint, init, schema).then(
         response => next(actionWith({
