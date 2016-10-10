@@ -70,6 +70,19 @@ function setNetAvailable(value) {
     netAvailable = value;
 }
 
+let EventTable = {};
+
+function execEvent(type, response) {
+    if(EventTable[type] && EventTable[type] instanceof Array && EventTable[type].length > 0) {
+        EventTable[type].forEach(
+            (callback) => {
+                callback(response);
+            }
+        );
+        EventTable[type] = [];
+    }
+}
+
 // A Redux middleware that interprets actions with API_MW_SYMBOL info specified.
 // Performs the call and promises when such actions are dispatched.
 var apiMiddleware =  ({ dispatch, getState }) => next => action => {
@@ -123,11 +136,16 @@ var apiMiddleware =  ({ dispatch, getState }) => next => action => {
 
 
     return callApi(endpoint, init, schema).then(
-        response => next(actionWith({
-            response,
-            type: successType
-        })),
-        error => Promise.reject(next(actionWith({
+        (response) => {
+            let successAction = actionWith({
+                response,
+                type: successType
+            });
+            let result = next(successAction);
+            execEvent(successType, successAction);
+            return result;
+        },
+        (error) => Promise.reject(next(actionWith({
             type: failureType,
             error: (error) ? (
                 (error instanceof Error) ? ({                       // 似乎唯一有可能返回Error对象就是因为网络无法连接
@@ -141,8 +159,34 @@ var apiMiddleware =  ({ dispatch, getState }) => next => action => {
     )
 };
 
+function addEvent(type, callback) {
+    if(!callback || typeof callback !== 'function') {
+        return;
+    }
+    if (EventTable[type] && EventTable[type] instanceof Array) {
+        EventTable[type].push(callback);
+        return;
+    }
+    EventTable[type] = [];
+    EventTable[type].push(callback);
+}
+
+function removeEvent(type, callback) {
+    if(!callback || typeof callback !== 'function') {
+        return;
+    }
+    if(EventTable[type] && EventTable[type] instanceof Array) {
+        const idx = EventTable[type].find(callback);
+        if(idx !== -1) {
+            EventTable[type].splice(idx, 1);
+        }
+    }
+}
+
 module.exports = {
     API_MW_SYMBOL,
     apiMiddleware,
-    setNetAvailable
+    setNetAvailable,
+    addEvent,
+    removeEvent,
 }
