@@ -145,18 +145,24 @@ var apiMiddleware =  ({ dispatch, getState }) => next => action => {
             execEvent(successType, successAction);
             return result;
         },
-        (error) => Promise.reject(next(actionWith({
-            type: failureType,
-            error: (error) ? (
-                (error instanceof Error) ? ({                       // 似乎唯一有可能返回Error对象就是因为网络无法连接
+        (err) => {
+            const error = (err) ? (
+                (err instanceof Error) ? ({                       // 似乎唯一有可能返回Error对象就是因为网络无法连接
                     code: errorCode.errorFailToAccessServer.code,
                     message: errorCode.errorFailToAccessServer.message
-                }) : (error)) : ({
+                }) : (err)) : ({
                 code: errorCode.errorUndefined.code,
                 message: errorCode.errorUndefined.message
-            })
-        })))
-    )
+            });
+            const failureAction = actionWith({
+                type: failureType,
+                error,
+            });
+            let result = next(failureAction);
+            execEvent(failureType, failureAction);
+            return Promise.reject(result);
+        }
+    );
 };
 
 function addEvent(type, callback) {
@@ -176,7 +182,7 @@ function removeEvent(type, callback) {
         return;
     }
     if(EventTable[type] && EventTable[type] instanceof Array) {
-        const idx = EventTable[type].find(callback);
+        const idx = EventTable[type].findIndex(callback);
         if(idx !== -1) {
             EventTable[type].splice(idx, 1);
         }
