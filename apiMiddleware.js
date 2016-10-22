@@ -72,14 +72,18 @@ function setNetAvailable(value) {
 
 let EventTable = {};
 
-function execEvent(type, response) {
+function execEvent(type, response, antiType) {
     if(EventTable[type] && EventTable[type] instanceof Array && EventTable[type].length > 0) {
         EventTable[type].forEach(
             (callback) => {
                 callback(response);
             }
         );
-        EventTable[type] = [];
+        delete EventTable[type];
+    }
+    if(EventTable[antiType]) {
+        // 将对应的反回调清空
+        delete EventTable[antiType];
     }
 }
 
@@ -142,7 +146,7 @@ var apiMiddleware =  ({ dispatch, getState }) => next => action => {
                 type: successType
             });
             let result = next(successAction);
-            execEvent(successType, successAction);
+            execEvent(successType, successAction, failureType);
             return result;
         },
         (err) => {
@@ -159,7 +163,7 @@ var apiMiddleware =  ({ dispatch, getState }) => next => action => {
                 error,
             });
             let result = next(failureAction);
-            execEvent(failureType, failureAction);
+            execEvent(failureType, failureAction, successType);
             return Promise.reject(result);
         }
     );
@@ -173,8 +177,7 @@ function addEvent(type, callback) {
         EventTable[type].push(callback);
         return;
     }
-    EventTable[type] = [];
-    EventTable[type].push(callback);
+    EventTable[type] = [callback];
 }
 
 function removeEvent(type, callback) {
