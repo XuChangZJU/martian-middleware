@@ -73,17 +73,21 @@ function setNetAvailable(value) {
 let EventTable = {};
 
 function execEvent(type, response, antiType) {
+    let callbacks;
     if(EventTable[type] && EventTable[type] instanceof Array && EventTable[type].length > 0) {
-        EventTable[type].forEach(
-            (callback) => {
-                callback(response);
-            }
-        );
+        callbacks = EventTable[type];
         delete EventTable[type];
     }
     if(EventTable[antiType]) {
         // 将对应的反回调清空
         delete EventTable[antiType];
+    }
+    if (callbacks) {
+        callbacks.forEach(
+            (callback) => {
+                callback(response);
+            }
+        );
     }
 }
 

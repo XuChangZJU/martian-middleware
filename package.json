@@ -14,8 +14,7 @@
     "normalizr": "^2.0.0",
     "isomorphic-fetch": "^2.1.1",
     "humps": "^1.0.0",
-    "es6-symbol":"^3.0.2",
-    "martian-domain": "XuChangZJU/martian-domain#dev"
+    "es6-symbol":"^3.0.2"
   },
   "devDependencies": {
     "babel": "^6.1.18",
