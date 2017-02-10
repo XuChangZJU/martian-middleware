@@ -202,4 +202,4 @@ module.exports = {
     setNetAvailable,
     addEvent,
     removeEvent,
-}
+};
