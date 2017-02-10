@@ -5,7 +5,8 @@
   "files": [
     "apiMiddleware.js",
     "populateHttpHeaderMiddleware.js",
-    "errorMiddleware.js"
+    "errorMiddleware.js",
+    "index.js"
   ],
   "scripts": {
     "test": "mocha --compilers js:babel-core/register --reporter spec test/*.js"
