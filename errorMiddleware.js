@@ -11,7 +11,7 @@ const errorMiddleware = ({ dispatch, getState }) => next => (action) => {
         return next(action);
     }
     next(action);
-    return dispatch(onError && onError(action.error));
+    return onError && dispatch(onError(action.error));
 };
 
 module.exports = {
