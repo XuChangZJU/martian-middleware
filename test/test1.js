@@ -2,8 +2,8 @@
  * Created by Administrator on 2016/2/5.
  */
 import chai from 'chai';
-import apiMiddleware from '../apiMiddleware';
-import {API_MW_SYMBOL} from '../apiMiddleware';
+import apiMiddleware from '../src/apiMiddleware';
+import {API_MW_SYMBOL} from '../src/apiMiddleware';
 import 'isomorphic-fetch'
 
 import { Schema, arrayOf, normalize } from 'normalizr';
