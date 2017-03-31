@@ -14,10 +14,8 @@ const humps = require("humps");
 const {
     camelizeKeys
 } = humps;
-const martianDomain = require("martian-domain");
-const {
-    errorCode
-} = martianDomain;
+
+const errorCode = require('martian-domain/lib/constants/errorCode');
 //import 'isomorphic-fetch'
 var Symbol = require('es6-symbol');
 
