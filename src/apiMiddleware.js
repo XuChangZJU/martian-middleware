@@ -18,6 +18,7 @@ const {
 const errorCode = require('martian-domain/lib/constants/errorCode');
 //import 'isomorphic-fetch'
 var Symbol = require('es6-symbol');
+import assign from 'lodash/assign';
 
 function callApi(apiEndPoint, init, schema) {
 
@@ -48,7 +49,7 @@ function callApi(apiEndPoint, init, schema) {
             const camelizedJson = camelizeKeys(json);
 
             if(schema) {
-                return Object.assign({},
+                return assign({},
                     normalize(camelizedJson, schema)
                 );
             }
@@ -124,7 +125,7 @@ var apiMiddleware =  ({ dispatch, getState }) => next => action => {
 
 
     function actionWith(data) {
-        const finalAction = Object.assign({}, action, data)
+        const finalAction = assign({}, action, data)
         delete finalAction[API_MW_SYMBOL]
         return finalAction
     }
