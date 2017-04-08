@@ -49,14 +49,14 @@ function callApi(apiEndPoint, init, schema) {
             const camelizedJson = camelizeKeys(json);
 
             if(schema) {
-                return assign({},
+                return Promise.resolve(assign({},
                     normalize(camelizedJson, schema)
-                );
+                ));
             }
             else {
-                return {
+                return Promise.resolve({
                     result: camelizedJson
-                }
+                });
             }
         })
 }
