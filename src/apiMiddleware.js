@@ -18,10 +18,34 @@ const {
 const errorCode = require('martian-domain/lib/constants/errorCode');
 //import 'isomorphic-fetch'
 var Symbol = require('es6-symbol');
+const sha1 = require('sha1');
+const merge = require("lodash/merge");
+const VERSION = '1.3.0';
 
-function callApi(apiEndPoint, init, schema) {
+function fortify(url, init) {
+    let url2;
+    if(url.indexOf('?') !== -1) {
+        url2 = url + `&time=${Date.now()}`;
+    } else {
+        url2 =  url + `?time=${Date.now()}`;
+    }
+    merge(init, {
+        headers: {
+            mnVersion: VERSION,
+            mnCode: sha1(`url2/${VERSION}`),
+        }
+    });
 
-    return fetch(apiEndPoint, init)
+    return url2;
+}
+
+function callApi(apiEndPoint, init, schema, fortifyRequest) {
+    let apiEndPoint2 = apiEndPoint;
+
+    if (fortifyRequest) {
+        apiEndPoint2 = fortify(apiEndPoint, init);
+    }
+    return fetch(apiEndPoint2, init)
         .then(response =>
             response.json().then(json => ({ json, response })))
         .then(({ json, response }) => {
@@ -91,7 +115,7 @@ function execEvent(type, response, antiType) {
 
 // A Redux middleware that interprets actions with API_MW_SYMBOL info specified.
 // Performs the call and promises when such actions are dispatched.
-var apiMiddleware =  ({ dispatch, getState }) => next => action => {
+var apiMiddleware = (fortify) => ({ dispatch, getState }) => next => action => {
     const callAPI = action[API_MW_SYMBOL]
 
     if (typeof callAPI === 'undefined') {
@@ -141,7 +165,7 @@ var apiMiddleware =  ({ dispatch, getState }) => next => action => {
     next(actionWith({ type: requestType }));
 
 
-    return callApi(endpoint, init, schema).then(
+    return callApi(endpoint, init, schema, fortify).then(
         (response) => {
             let successAction = actionWith({
                 response,
