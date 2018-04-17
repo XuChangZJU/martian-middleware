@@ -3,19 +3,17 @@
 /*
  import { Schema, arrayOf, normalize } from 'normalizr';
  import { camelizeKeys } from 'humps';
- import {errorCode} from "yr-domains";
  */
 
 const normalizr = require("normalizr");
 const {
-    Schema, arrayOf, normalize
+    normalize,
 } = normalizr;
 const humps = require("humps");
 const {
     camelizeKeys
 } = humps;
 
-const errorCode = require('martian-domain/lib/constants/errorCode');
 //import 'isomorphic-fetch'
 var Symbol = require('es6-symbol');
 const sha1 = require('sha1');
@@ -62,8 +60,7 @@ function callApi(apiEndPoint, init, schema, fortifyRequest) {
                 else {
                     error = {
                         httpCode: response.status,
-                        code: errorCode.errorUndefined.code,
-                        message: errorCode.errorUndefined.message
+                        message: 'unknown error',
                     }
                 }
                 return Promise.reject(error)
@@ -92,7 +89,14 @@ function setNetAvailable(value) {
     netAvailable = value;
 }
 
+var Messages = {};
+
+function setMessage(messageNetUnavailble, messageUnreach, messageUnknown) {
+    assign(Messages, { messageNetUnavailble, messageUnreach, messageUnknown });
+}
+
 let EventTable = {};
+
 
 function execEvent(type, response, antiType) {
     let callbacks;
@@ -158,7 +162,9 @@ var apiMiddleware = (fortify) => ({ dispatch, getState }) => next => action => {
     if(!netAvailable) {
         return Promise.reject(next({
             type: failureType,
-            error: errorCode.errorNetUnavailable
+            error: {
+                message: Messages.messageNetUnavailble || '不明错误',
+            }
         }));
     }
 
@@ -178,11 +184,9 @@ var apiMiddleware = (fortify) => ({ dispatch, getState }) => next => action => {
         (err) => {
             const error = (err) ? (
                 (err instanceof Error) ? ({                       // 似乎唯一有可能返回Error对象就是因为网络无法连接
-                    code: errorCode.errorFailToAccessServer.code,
-                    message: errorCode.errorFailToAccessServer.message
+                    message: Messages.messageUnreach || '无法访问服务器'
                 }) : (err)) : ({
-                code: errorCode.errorUndefined.code,
-                message: errorCode.errorUndefined.message
+                message: Messages.messageNetUnavailble || '不明错误',
             });
             const failureAction = actionWith({
                 type: failureType,
@@ -222,6 +226,7 @@ module.exports = {
     API_MW_SYMBOL,
     apiMiddleware,
     setNetAvailable,
+    setMessage,
     addEvent,
     removeEvent,
 };

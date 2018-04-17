@@ -29,7 +29,7 @@
     },
     "es": {
       "plugins": [
-        "./build/use-lodash-es"
+        "external-helpers"
       ]
     }
   }

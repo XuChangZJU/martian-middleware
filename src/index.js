@@ -2,17 +2,22 @@
  * Created by lavystord on 17/2/10.
  */
 
+import { apiMiddleware, setNetAvailable, setMessage, addEvent, removeEvent, API_MW_SYMBOL } from './apiMiddleware';
+import { errorMiddleware, registerErrorHandler } from './errorMiddleware';
+import { genPopulateHttpHeaderMiddleware, POPULATE_HTTP_HEADER_MW_SYMBOL } from './populateHttpHeaderMiddleware';
+
 module.exports = {
-    apiMiddleware: require('./apiMiddleware').apiMiddleware,
-    errorMiddleware: require('./errorMiddleware').errorMiddleware,
-    genPopulateHttpHeaderMiddleware: require('./populateHttpHeaderMiddleware').genPopulateHttpHeaderMiddleware,
+    apiMiddleware,
+    errorMiddleware,
+    genPopulateHttpHeaderMiddleware,
     //
-    setNetAvailable: require('./apiMiddleware').setNetAvailable,
-    addEvent: require('./apiMiddleware').addEvent,
-    removeEvent: require('./apiMiddleware').removeEvent,
-    API_MW_SYMBOL: require('./apiMiddleware').API_MW_SYMBOL,
+    setNetAvailable,
+    setMessage,
+    addEvent,
+    removeEvent,
+    API_MW_SYMBOL,
     //
-    POPULATE_HTTP_HEADER_MW_SYMBOL: require('./populateHttpHeaderMiddleware').POPULATE_HTTP_HEADER_MW_SYMBOL,
+    POPULATE_HTTP_HEADER_MW_SYMBOL,
     //
-    registerErrorHandler: require('./errorMiddleware').registerErrorHandler,
+    registerErrorHandler,
 };
