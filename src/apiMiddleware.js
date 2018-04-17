@@ -92,7 +92,7 @@ function setNetAvailable(value) {
 var Messages = {};
 
 function setMessage(messageNetUnavailble, messageUnreach, messageUnknown) {
-    assign(Messages, { messageNetUnavailble, messageUnreach, messageUnknown });
+    Object.assign(Messages, { messageNetUnavailble, messageUnreach, messageUnknown });
 }
 
 let EventTable = {};
