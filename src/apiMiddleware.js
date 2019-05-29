@@ -60,7 +60,7 @@ function callApi(apiEndPoint, init, schema, fortifyRequest) {
                 else {
                     error = {
                         httpCode: response.status,
-                        message: 'unknown error',
+                        message: Messages.messageUnknown || '未定义的错误',
                     }
                 }
                 return Promise.reject(error)
