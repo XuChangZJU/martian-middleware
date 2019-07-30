@@ -1,10 +1,5 @@
 'use strict';
 
-/*
- import { Schema, arrayOf, normalize } from 'normalizr';
- import { camelizeKeys } from 'humps';
- */
-
 const normalizr = require("normalizr");
 const {
     normalize,
@@ -14,11 +9,16 @@ const {
     camelizeKeys
 } = humps;
 
-//import 'isomorphic-fetch'
 var Symbol = require('es6-symbol');
 const sha1 = require('sha1');
 const merge = require("lodash/merge");
 const VERSION = '1.3.0';
+let fetch2;
+
+function setFetch(fetch3) {
+    //由外层注入fetch请求 注意返回值
+    fetch2 = fetch3;
+}
 
 function fortify(url, init) {
     let url2;
@@ -43,10 +43,10 @@ function callApi(apiEndPoint, init, schema, fortifyRequest) {
     if (fortifyRequest) {
         apiEndPoint2 = fortify(apiEndPoint, init);
     }
-    return fetch(apiEndPoint2, init)
+    return (fetch2 ? fetch2(apiEndPoint2, init) : fetch(apiEndPoint2, init)
         .then(response =>
             response.json().then(json => ({ json, response })))
-        .then(({ json, response }) => {
+        ).then(({ json, response }) => {
             if (!response.ok || json.error != undefined) {      // 为了避免运营商劫持，服务器可能以200的code来返回错误
                 var error;
                 if(json.error != undefined) {
@@ -229,4 +229,5 @@ module.exports = {
     setMessage,
     addEvent,
     removeEvent,
+    setFetch,
 };
