@@ -13,7 +13,7 @@ var Symbol = require('es6-symbol');
 const sha1 = require('sha1');
 const merge = require("lodash/merge");
 const VERSION = '1.3.0';
-let fetch2;
+let fetch2 = fetch;
 
 function setFetch(fetch3) {
     //由外层注入fetch请求 注意返回值
@@ -43,60 +43,70 @@ function callApi(apiEndPoint, init, schema, fortifyRequest) {
     if (fortifyRequest) {
         apiEndPoint2 = fortify(apiEndPoint, init);
     }
-    const responseType = init.responseType;
-
     return fetch2(apiEndPoint2, init)
         .then((response) => {
-            switch (responseType) {
-                case 'arraybuffer':
-                    return response.arrayBuffer();
-                case 'blob':
-                    return response.blob();
-                default:
-                    const contentType = response.headers.get('Content-Type');
+            const contentType = response.headers.get('Content-Type');
 
-                    if (contentType.includes('application/json')) {
-                        return response.json().then(
-                            json => ({ json, response })
-                        ).then(
-                            ({ json, response: response2 }) => {
-                                if (!response2.ok || json.error !== undefined) {
-                                    // 为了避免运营商劫持，服务器可能以200的code来返回错误
-                                    var error;
-                                    if(json.error !== undefined) {
-                                        error = Object.assign(
-                                            json.error,
-                                            {
-                                                httpCode: response2.status
-                                            }
-                                        )
+            if (contentType.includes('application/json')) {
+                return response.json().then(
+                    json => ({ json, response })
+                ).then(
+                    ({ json, response: response2 }) => {
+                        if (!response2.ok || json.error !== undefined) {
+                            // 为了避免运营商劫持，服务器可能以200的code来返回错误
+                            var error;
+                            if(json.error !== undefined) {
+                                error = Object.assign(
+                                    json.error,
+                                    {
+                                        httpCode: response2.status
                                     }
-                                    else {
-                                        error = {
-                                            httpCode: response2.status,
-                                            message: Messages.messageUnknown || '未定义的错误',
-                                        }
-                                    }
-                                    return Promise.reject(error)
-                                }
-
-                                const camelizedJson = camelizeKeys(json);
-
-                                if(schema) {
-                                    return Promise.resolve(Object.assign({},
-                                        normalize(camelizedJson, schema)
-                                    ));
-                                }
-                                else {
-                                    return Promise.resolve({
-                                        result: camelizedJson
-                                    });
+                                )
+                            }
+                            else {
+                                error = {
+                                    httpCode: response2.status,
+                                    message: Messages.messageUnknown || '未定义的错误',
                                 }
                             }
-                        )
+                            return Promise.reject(error)
+                        }
+
+                        const camelizedJson = camelizeKeys(json);
+
+                        if(schema) {
+                            return Promise.resolve(Object.assign({},
+                                normalize(camelizedJson, schema)
+                            ));
+                        }
+                        else {
+                            return Promise.resolve({
+                                result: camelizedJson
+                            });
+                        }
                     }
-                    return response.text();
+                )
             }
+            else if (
+                contentType.includes('text')
+                || contentType.includes('xml')
+                || contentType.includes('html')
+            ) {
+                return response.text().then(
+                    (text) => {
+                        return Promise.resolve(text);
+                    }
+                )
+            }
+            else if (contentType.includes('application/octet-stream')) {
+                return response.arrayBuffer().then(
+                    (arrayBuffer) => {
+                        return Promise.resolve(arrayBuffer);
+                    }
+                )
+            }
+
+            return Promise.resolve(response);
         })
 }
 
