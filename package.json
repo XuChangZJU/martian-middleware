@@ -10,6 +10,8 @@
   "scripts": {
     "test": "mocha --compilers js:babel-core/register --reporter spec test/*.js",
     "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
+    "precommit": "npm run build",
+    "postcommit": "git add lib* && git commit -m auto-build",
     "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup -c -o dist/martian-middleware.js",
     "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production rollup -c -o dist/martian-middleware.min.js"
   },
