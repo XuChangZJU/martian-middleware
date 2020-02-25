@@ -13,7 +13,7 @@ var Symbol = require('es6-symbol');
 const sha1 = require('sha1');
 const merge = require("lodash/merge");
 const VERSION = '1.3.0';
-let fetch2 = fetch;
+let fetch2;
 
 function setFetch(fetch3) {
     //由外层注入fetch请求 注意返回值
@@ -43,7 +43,8 @@ function callApi(apiEndPoint, init, schema, fortifyRequest) {
     if (fortifyRequest) {
         apiEndPoint2 = fortify(apiEndPoint, init);
     }
-    return fetch2(apiEndPoint2, init)
+    const fetch3 = fetch2 ? fetch2 : fetch;
+    return fetch3(apiEndPoint2, init)
         .then((response) => {
             const contentType = response.headers.get('Content-Type');
 
