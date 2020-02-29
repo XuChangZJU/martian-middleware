@@ -46,37 +46,49 @@ function callApi(apiEndPoint, init, schema, fortifyRequest) {
     const fetch3 = fetch2 ? fetch2 : fetch;
     return fetch3(apiEndPoint2, init)
         .then((response) => {
-            const contentType = response.headers.get('Content-Type');
+            if (!response.ok) {
+                // response.ok不为true是 返回reject
+                let error = {
+                    httpCode: response.status,
+                    message: Messages.messageUnknown || '未定义的错误'
+                };
+                if (response.status >= 500) {
+                    error = {
+                        httpCode: response.status,
+                        message: '服务器响应出错'
+                    }
+                }
+                else if (response.status >= 400) {
+                    error = {
+                        httpCode: response.status,
+                        message: '客户端响应出错'
+                    }
+                }
+
+                return Promise.reject(error);
+            }
+            const { headers } = response;
+            const contentType = headers.get('Content-Type');
 
             if (contentType.includes('application/json')) {
                 return response.json().then(
-                    json => ({ json, response })
-                ).then(
-                    ({ json, response: response2 }) => {
-                        if (!response2.ok || json.error !== undefined) {
-                            // 为了避免运营商劫持，服务器可能以200的code来返回错误
-                            var error;
-                            if(json.error !== undefined) {
-                                error = Object.assign(
-                                    json.error,
-                                    {
-                                        httpCode: response2.status
-                                    }
-                                )
-                            }
-                            else {
-                                error = {
-                                    httpCode: response2.status,
-                                    message: Messages.messageUnknown || '未定义的错误',
+                    (json) => {
+                        if( json.error !== undefined ) {
+                            const error = Object.assign(
+                                json.error,
+                                {
+                                    httpCode: response.status
                                 }
-                            }
+                            );
+
                             return Promise.reject(error)
                         }
 
                         const camelizedJson = camelizeKeys(json);
 
                         if(schema) {
-                            return Promise.resolve(Object.assign({},
+                            return Promise.resolve(Object.assign(
+                                {},
                                 normalize(camelizedJson, schema)
                             ));
                         }
