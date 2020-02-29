@@ -55,13 +55,13 @@ function callApi(apiEndPoint, init, schema, fortifyRequest) {
                 if (response.status >= 500) {
                     error = {
                         httpCode: response.status,
-                        message: '服务器响应出错'
+                        message: Messages.messageUnreach || '服务器响应错误'
                     }
                 }
                 else if (response.status >= 400) {
                     error = {
                         httpCode: response.status,
-                        message: '客户端响应出错'
+                        message: Messages.messageClientRequest || '客户端请求错误'
                     }
                 }
 
@@ -133,8 +133,8 @@ function setNetAvailable(value) {
 
 var Messages = {};
 
-function setMessage(messageNetUnavailble, messageUnreach, messageUnknown) {
-    Object.assign(Messages, { messageNetUnavailble, messageUnreach, messageUnknown });
+function setMessage(messageNetUnavailble, messageUnreach, messageUnknown, messageClientRequest) {
+    Object.assign(Messages, { messageNetUnavailble, messageUnreach, messageUnknown, messageClientRequest });
 }
 
 let EventTable = {};
